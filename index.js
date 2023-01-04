@@ -34,6 +34,11 @@ class Player {
             c.fill()
             c.closePath()
     }
+    update() {
+        this.draw()
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+    }
 }
 const map = [
 ['-','-','-','-','-','-'], 
@@ -70,11 +75,20 @@ map.forEach((row, i) => {
         }
     })
 })
-boundaries.forEach((boundary) => {
-    boundary.draw()
-})
+function animate() {
+    requestAnimationFrame(animate)
+    c.clearRect(0, 0, canvas.width, canvas.height)
+    boundaries.forEach((boundary) => {
+        boundary.draw()
+    })
+    
+    player.update()
 
-player.draw()
+}
+
+animate()
+
+
 
 addEventListener('keydown', ({key}) => {
  
