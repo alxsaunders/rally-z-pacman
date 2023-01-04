@@ -40,13 +40,7 @@ class Player {
         this.position.y += this.velocity.y
     }
 }
-const map = [
-['-','-','-','-','-','-'], 
-['-',' ',' ',' ',' ','-'], 
-['-',' ','-','-',' ','-'],
-['-',' ',' ',' ',' ','-'],
-['-','-','-','-','-','-'],
-]
+
 const boundaries = []
 const player = new Player({
     position: {
@@ -59,6 +53,32 @@ const player = new Player({
         y:0
     }
 })
+
+const keys = {
+    w: {
+        pressed: false
+    },
+    a: {
+        pressed: false
+    },
+    s: {
+        pressed: false
+    },
+    d: {
+        pressed: false
+    }
+}
+
+let lastkey = ''
+
+const map = [
+    ['-','-','-','-','-','-'], 
+    ['-',' ',' ',' ',' ','-'], 
+    ['-',' ','-','-',' ','-'],
+    ['-',' ',' ',' ',' ','-'],
+    ['-','-','-','-','-','-'],
+    ]
+
 map.forEach((row, i) => {
     row.forEach((symbol, j) => { 
         switch (symbol) {
@@ -83,6 +103,17 @@ function animate() {
     })
     
     player.update()
+    player.velocity.y = 0
+    player.velocity.x = 0
+    if(keys.w.pressed && lastkey === 'w') {
+        player.velocity.y = -5
+    } else if (keys.a.pressed && lastkey === 'a') {
+        player.velocity.x = -5
+    } else if (keys.s.pressed && lastkey === 's') {
+        player.velocity.y = 5
+    } else if (keys.d.pressed && lastkey === 'd') {
+        player.velocity.x = 5
+    }
 
 }
 
@@ -94,17 +125,43 @@ addEventListener('keydown', ({key}) => {
  
     switch (key) {
         case 'w':
-        player.velocity.y = -5
+        keys.w.pressed = true
+        lastkey = 'w'
         break
         case 'a':
-        player.velocity.x = -5
+        keys.a.pressed = true
+        lastkey = 'a'
         break
-        case 'd':
-        player.velocity.x = 5
+        case 's':
+        keys.s.pressed = true
+        lastkey = 's'
         break
-         case 's':
-        player.velocity.y = 5
+         case 'd':
+        keys.d.pressed = true
+        lastkey = 'd'
         break
     }
-    console.log(player.velocity)
+
+    
 })
+
+addEventListener('keyup', ({key}) => {
+ 
+    switch (key) {
+        case 'w':
+        keys.w.pressed = false
+        break
+        case 'a':
+        keys.a.pressed = false
+        break
+        case 's':
+        keys.s.pressed = false
+        break
+        case 'd':
+        keys.d.pressed = false
+        break
+        }
+      
+       
+})
+
