@@ -20,6 +20,28 @@ class Boundary {
         c.drawImage(this.image, this.position.x, this.position.y)
     }
 }
+class Flag {
+    static width = 30
+    static height = 30
+    constructor({position, image}){
+        this.position = position
+        this.width = 40
+        this.height = 40
+        this.image = image
+    }
+
+    draw() {
+        // c.beginPath()
+        // c.arc(this.position.x, this.position.y, this.radius, 0,
+        //     Math.PI * 2)
+        //     c.fillStyle = 'yellow'
+        //     c.fill()
+        //     c.closePath()
+        c.drawImage(this.image, this.position.x, this.position.y)  
+    }
+}
+const flags = []
+
 class Player {
     constructor({position, velocity}){
    
@@ -42,6 +64,7 @@ class Player {
         this.position.y += this.velocity.y
     }
 }
+
 
 const boundaries = []
 const player = new Player({
@@ -75,7 +98,7 @@ let lastkey = ''
 
 const map = [
     ['-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-'], 
-    ['-',' ',' ',' ',' ',' ',' ','-','-',' ',' ',' ',' ',' ','-','-','-','-','-','-','-','-',' ',' ',' ',' ',' ',' ','-'], 
+    ['-',' ','.',' ',' ',' ',' ','-','-',' ',' ',' ',' ',' ','-','-','-','-','-','-','-','-',' ',' ',' ',' ',' ',' ','-'], 
     ['-',' ','-','-',' ','-',' ',' ',' ',' ','-','-','-',' ','-','-','-',' ',' ',' ','-','-',' ','-',' ','-','-',' ','-'],
     ['-',' ','-','-',' ','-',' ','-','-',' ','-','-','-',' ',' ',' ',' ',' ','-',' ','-',' ',' ','-',' ','-','-',' ','-'],
     ['-',' ',' ',' ',' ',' ',' ','-','-',' ','-','-',' ',' ',' ','-','-',' ','-',' ',' ',' ','-','-',' ','-','-',' ','-'],
@@ -112,6 +135,17 @@ map.forEach((row, i) => {
                     })
                     )
                 break
+            case '.':
+                flags.push(
+                    new Flag({
+                         position: {
+                            x: Boundary.width * j,
+                            y: Boundary.height * i
+                            },
+                            image: createImage('./images/flag.png')
+                        })
+                        )
+                    break    
         }
     })
 })
@@ -213,6 +247,10 @@ function animate() {
             }
         }
     }
+
+    flags.forEach(flag => {
+        flag.draw()
+    })
 
     boundaries.forEach((boundary) => {
         boundary.draw()
