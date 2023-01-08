@@ -27,6 +27,7 @@ class Flag {
         this.position = position
         this.width = 40
         this.height = 40
+        this.radius = 10
         this.image = image
     }
 
@@ -248,8 +249,18 @@ function animate() {
         }
     }
 
-    flags.forEach(flag => {
+    flags.forEach((flag, i )=> {
         flag.draw()
+
+        if (
+            Math.hypot(
+                flag.position.x - player.position.x, 
+                flag.position.y - player.position.y
+                ) < flag.radius + player.radius
+                ) {
+                    console.log('touching')
+                    flags.splice(i, 1)
+                }
     })
 
     boundaries.forEach((boundary) => {
