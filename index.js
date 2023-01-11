@@ -217,12 +217,12 @@ function collision({
     )
 }
 
-// let animationId
+let animationId
 
 function animate() {
-    // animationId = 
+    animationId = 
     requestAnimationFrame(animate)
-    // console.log(animationId)
+    console.log(animationId)
 
     c.clearRect(0, 0, canvas.width, canvas.height)
 
