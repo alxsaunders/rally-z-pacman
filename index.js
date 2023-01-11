@@ -34,12 +34,14 @@ class Ghost {
         this.velocity = velocity
         this.radius = 15
         this.image = image
+        this.image2 = createImage('./images/ufo2.png')
         this.prevCollisions =[]
         this.speed = 2
+        this.scared = false
     }
 
     draw() {
-        c.drawImage(this.image, this.position.x -18, this.position.y-13)  
+        c.drawImage(this.scared ? this.image2 : this.image, this.position.x -18, this.position.y-13)  
         c.beginPath()
         c.arc(this.position.x, this.position.y, this.radius, 0,
             Math.PI * 2)
@@ -55,6 +57,29 @@ class Ghost {
 }
 
 class Flag {
+    static width = 30
+    static height = 30
+    constructor({position, image}){
+        this.position = position
+        this.width = 40
+        this.height = 40
+        this.radius = 10
+        this.image = image
+    }
+
+    draw() {
+        // c.beginPath()
+        // c.arc(this.position.x, this.position.y, this.radius, 0,
+        //     Math.PI * 2)
+        //     c.fillStyle = 'yellow'
+        //     c.fill()
+        //     c.closePath()
+        c.drawImage(this.image, this.position.x, this.position.y)  
+
+    }
+}
+
+class PowerUp {
     static width = 30
     static height = 30
     constructor({position, image}){
@@ -103,6 +128,7 @@ class Player {
 
 const flags = []
 const boundaries = []
+const powerUps = []
 const ghosts = [
     new Ghost({
    position:{
@@ -113,8 +139,22 @@ const ghosts = [
     x: Ghost.speed,
     y:0
    },
-   image: createImage('./images/ufo.png')     
-})]
+   image: createImage('./images/ufo.png'),
+     
+}),
+new Ghost({
+    position:{
+     x:Boundary.width + Boundary.width *9,
+     y:Boundary.height  *10.5
+    },
+    velocity: {
+     x: Ghost.speed,
+     y:0
+    },
+    image: createImage('./images/ufo.png'),  
+ })
+ ]
+
 const player = new Player({
     position: {
         x:Boundary.width + Boundary.width /2,
@@ -157,7 +197,7 @@ const map = [
     ['-',' ','-',' ',' ',' ','-','-','-','-',' ','.',' ',' ',' ','-','-',' ','-','-','-','-',' ','-',' ',' ',' ',' ','-'],
     ['-',' ','-',' ','-',' ','-','-','-','-',' ','-','-',' ','-','-','-',' ','-','-','-','-',' ','-','-','-','-',' ','-'],
     ['-',' ',' ',' ',' ','.','-','-','-',' ',' ','-','-',' ','-','-','-',' ','-','-','-','-',' ',' ',' ',' ','-',' ','-'],
-    ['-',' ','-','-',' ','-','-','-','-',' ','-','-','-',' ','-',' ',' ',' ',' ','-',' ',' ','.','-','-',' ','-',' ','-'],
+    ['-',' ','-','-',' ','-','-','-','-',' ','-','-','-',' ','-',' ',' ',' ',' ','-',' ',' ','.','-','-',' ','-','0','-'],
     ['-','.',' ',' ',' ',' ',' ',' ',' ',' ',' ','.',' ',' ',' ',' ','-','-',' ',' ',' ','-','-','-','-',' ',' ','.','-'],
     ['-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-'], 
 
@@ -194,7 +234,18 @@ map.forEach((row, i) => {
                             image: createImage('./images/flag.png')
                         })
                         )
-                    break    
+                    break   
+                    case '0':
+                        powerUps.push(
+                            new PowerUp({
+                                 position: {
+                                    x: Boundary.width * j + 5,
+                                    y: Boundary.height * i +5  
+                                    },
+                                    image: createImage('./images/powerup.png')
+                                })
+                                )
+                            break     
         }
     })
 })
@@ -222,7 +273,7 @@ let animationId
 function animate() {
     animationId = 
     requestAnimationFrame(animate)
-    console.log(animationId)
+    // console.log(animationId)
 
     c.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -303,6 +354,36 @@ function animate() {
             }
         }
     }
+//player collides with powerup
+    for (let i = powerUps.length - 1; 0 <= i; i--) {
+       const powerUp = powerUps[i] 
+       powerUp.draw()
+
+       if (
+        Math.hypot(
+            powerUp.position.x - player.position.x, 
+            powerUp.position.y - player.position.y
+            ) < powerUp.radius + player.radius
+            ) {
+                powerUps.splice(i, 1)
+
+
+                //make ufo scared
+                ghosts.forEach(ghost => {
+                    ghost.scared = true
+                    
+                    setTimeout(() => {
+                        ghost.scared = false
+                      
+                    }, 5000)
+                } )
+
+
+
+            }
+    }
+
+
 
     flags.forEach((flag, i )=> {
         flag.draw()
@@ -336,6 +417,16 @@ function animate() {
     player.update()
    ghosts.forEach(ghost => {
     ghost.update()
+
+    if (
+        Math.hypot(
+            ghost.position.x - player.position.x, 
+            ghost.position.y - player.position.y
+            ) < ghost.radius + player.radius
+            ) {
+                cancelAnimationFrame(animationId)
+                console.log('you lose')
+            }
 
 
     const collisions2 = []
@@ -408,17 +499,17 @@ function animate() {
         if (ghost.velocity.y > 0) ghost.prevCollisions.push('down')
         if (ghost.velocity.y < 0) ghost.prevCollisions.push('up')
 
-        console.log(collisions2)
-        console.log(ghost.prevCollisions)
+        // console.log(collisions2)
+        // console.log(ghost.prevCollisions)
 
         const pathways = ghost.prevCollisions.filter(collision =>
            {
             return !collisions2.includes(collision)
            } )
-           console.log({pathways})
+        //    console.log({pathways})
 
            const direction = pathways[Math.floor(Math.random() * pathways.length)]
-           console.log({direction})
+        //    console.log({direction})
 
            switch (direction) {
             case 'down':
