@@ -97,27 +97,32 @@ class PowerUp {
         //     c.fillStyle = 'yellow'
         //     c.fill()
         //     c.closePath()
-        c.drawImage(this.image, this.position.x, this.position.y)  
+        c.drawImage(this.image, this.position.x , this.position.y)  
 
     }
 }
 
 
 class Player {
-    constructor({position, velocity}){
+    constructor({position, velocity, image}){
    
         this.position = position 
         this.velocity = velocity
         this.radius = 15
+        this.image = image
     }
 
     draw() {
-        c.beginPath()
-        c.arc(this.position.x, this.position.y, this.radius, 0,
-            Math.PI * 2)
-            c.fillStyle = 'yellow'
-            c.fill()
-            c.closePath()
+        // c.save
+        // c.beginPath()
+        // c.arc(this.position.x, this.position.y, this.radius, 0,
+        //     Math.PI * 2)
+        //     c.fillStyle = 'yellow'
+        //     c.fill()
+        //     c.closePath()
+        //     c.restore
+
+        c.drawImage(this.image, this.position.x - 16, this.position.y-16) 
     }
     update() {
         this.draw()
@@ -153,6 +158,31 @@ new Ghost({
     },
     image: createImage('./images/ufo.png'),  
  })
+ ,
+new Ghost({
+    position:{
+     x:Boundary.width + Boundary.width *22,
+     y:Boundary.height  *10.5
+    },
+    velocity: {
+     x: Ghost.speed,
+     y:0
+    },
+    image: createImage('./images/ufo.png'),  
+ })
+ ,
+new Ghost({
+    position:{
+     x:Boundary.width + Boundary.width *2,
+     y:Boundary.height  *10.5
+    },
+    velocity: {
+     x: Ghost.speed,
+     y:0
+    },
+    image: createImage('./images/ufo.png'),  
+ })
+
  ]
 
 const player = new Player({
@@ -164,7 +194,8 @@ const player = new Player({
     velocity:{
         x:0,
         y:0
-    }
+    },
+    image: createImage('./images/ship.png'),  
 })
 
 const keys = {
@@ -354,6 +385,34 @@ function animate() {
             }
         }
     }
+    //detect collision between ghosts and player
+    for (let i = ghosts.length - 1; 0 <= i; i--) {
+        const ghost = ghosts[i]
+    if (
+        Math.hypot(
+            ghost.position.x - player.position.x, 
+            ghost.position.y - player.position.y
+            ) < 
+            ghost.radius + player.radius 
+            ) {
+                if(ghost.scared) {
+                    ghosts.splice(i, 1)
+                } else {
+
+                
+                cancelAnimationFrame(animationId)
+                console.log('you lose')
+                }
+            }
+        }
+
+
+//win condtion goes here
+if (flags.length === 0){
+    console.log('you win')
+    cancelAnimationFrame(animationId)
+}
+
 //player collides with powerup
     for (let i = powerUps.length - 1; 0 <= i; i--) {
        const powerUp = powerUps[i] 
@@ -418,16 +477,9 @@ function animate() {
    ghosts.forEach(ghost => {
     ghost.update()
 
-    if (
-        Math.hypot(
-            ghost.position.x - player.position.x, 
-            ghost.position.y - player.position.y
-            ) < ghost.radius + player.radius
-            ) {
-                cancelAnimationFrame(animationId)
-                console.log('you lose')
-            }
 
+// ghost touches player
+    
 
     const collisions2 = []
     boundaries.forEach(boundary => {
